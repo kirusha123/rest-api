@@ -34,6 +34,10 @@ func (s *APIserver) Start() error {
 	s.configureRouter()
 	s.logger.Info("starting api server")
 
+	if err := s.configureStore(); err != nil {
+		return err
+	}
+
 	return http.ListenAndServe(s.cfg.BindAddr, s.router)
 }
 
@@ -57,4 +61,15 @@ func (s *APIserver) handleHello() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Hi, Dude")
 	}
+}
+
+func (s *APIserver) configureStore() error {
+	st := store.New(s.cfg.store) //Parse toml `db_url` doesn't works DBURL added in app/store/config.go=> func Open()
+	if err := st.Open(); err != nil {
+		return err
+	}
+
+	s.store = st
+	s.logger.Info("DB connected")
+	return nil
 }
