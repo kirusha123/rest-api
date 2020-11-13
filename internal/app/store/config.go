@@ -1,11 +1,11 @@
 package store
 
-type sConfig struct {
+type Config struct {
 	DBURL string `toml:"db_url"`
 }
 
-func NewCfg() *sConfig {
-	return &sConfig{
+func NewCfg() *Config {
+	return &Config{
 		DBURL: "",
 	}
 }

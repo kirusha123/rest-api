@@ -1,11 +1,11 @@
 package store
 
-type store struct {
-	cfg *sConfig
+type Store struct {
+	cfg *Config
 }
 
-func New(config *sConfig) *store {
-	return &store{
+func New(config *Config) *Store {
+	return &Store{
 		cfg: config,
 	}
 }
