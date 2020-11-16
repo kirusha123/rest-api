@@ -18,7 +18,7 @@ func New(config *Config) *Store {
 }
 
 func (s *Store) Open() error {
-	db, err := sql.Open("postgres" /*s.cfg.DBURL*/, "host=localhost port=5432 user=postgres password=admin dbname=TestDB sslmode=disable")
+	db, err := sql.Open("postgres", s.cfg.DBURL /*"host=localhost port=5432 user=postgres password=admin dbname=TestDB sslmode=disable"*/)
 
 	if err != nil {
 		return err

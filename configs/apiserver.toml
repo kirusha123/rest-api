@@ -1,5 +1,4 @@
 bind_addr = ":8080"
 log_lvl = "debug"
 
-[store]
 db_url = "host=localhost port=5432 user=postgres password=admin dbname=TestDB sslmode=disable"
