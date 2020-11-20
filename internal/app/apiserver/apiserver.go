@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//APIserver ...
 type APIserver struct {
 	cfg    *Config
 	logger *logrus.Logger
@@ -16,15 +17,17 @@ type APIserver struct {
 	store  *store.Store
 }
 
+//New ...
 func New(config *Config) *APIserver {
 	return &APIserver{
 		cfg:    config,
+		store:  store.New(config.store),
 		logger: logrus.New(),
 		router: mux.NewRouter(),
-		store:  store.New(config.store),
 	}
 }
 
+//Start ...
 func (s *APIserver) Start() error {
 
 	if err := s.configureLogger(); err != nil {
@@ -34,8 +37,10 @@ func (s *APIserver) Start() error {
 	s.configureRouter()
 	s.logger.Info("starting api server")
 
-	if err := s.configureStore(); err != nil {
-		return err
+	s.configureStore()
+	if testDB := s.store.GetDB(); testDB == nil {
+		s.logger.Info("Failed to connect db")
+		return nil
 	}
 
 	return http.ListenAndServe(s.cfg.BindAddr, s.router)
@@ -55,6 +60,8 @@ func (s *APIserver) configureLogger() error {
 
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
+	s.router.HandleFunc("/api/createtables", s.handleCreateTeables())
+
 }
 
 func (s *APIserver) handleHello() http.HandlerFunc {
@@ -63,13 +70,23 @@ func (s *APIserver) handleHello() http.HandlerFunc {
 	}
 }
 
-func (s *APIserver) configureStore() error {
-	st := store.New(s.cfg.store) //Parse toml `db_url` doesn't works DBURL added in app/store/config.go=> func Open()
-	if err := st.Open(); err != nil {
-		return err
+func (s *APIserver) handleCreateTeables() http.HandlerFunc {
+	/*err := s.store.CreateTables()
+	if err != nil {
+		return func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "Error to create Tables")
+		}
+	}*/
+	s.store.Connect()
+	s.store.CreateTables()
+	str := s.cfg.store.Addr + " " + s.cfg.store.Pass + " " + s.cfg.store.User + " " + s.cfg.store.DBname
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, str)
 	}
 
-	s.store = st
-	s.logger.Info("DB connected")
-	return nil
+}
+
+func (s *APIserver) configureStore() {
+
+	s.store.Connect()
 }
