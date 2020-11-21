@@ -60,8 +60,9 @@ func (s *APIserver) configureLogger() error {
 
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
-	s.router.HandleFunc("/api/createtables", s.handleCreateTeables())
-
+	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables())
+	s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks())
+	//s.router.HandleFunc("/api/remove/blocks", s.handleRemoveBlocks())
 }
 
 func (s *APIserver) handleHello() http.HandlerFunc {
@@ -71,20 +72,47 @@ func (s *APIserver) handleHello() http.HandlerFunc {
 }
 
 func (s *APIserver) handleCreateTeables() http.HandlerFunc {
-	/*err := s.store.CreateTables()
+	s.store.Connect()
+	err := s.store.CreateTables()
 	if err != nil {
 		return func(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, "Error to create Tables")
 		}
-	}*/
-	s.store.Connect()
-	s.store.CreateTables()
-	str := s.cfg.store.Addr + " " + s.cfg.store.Pass + " " + s.cfg.store.User + " " + s.cfg.store.DBname
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, str)
+		io.WriteString(w, "Tables Transaction & Blocks created")
 	}
 
 }
+
+func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
+	s.store.Connect()
+	defer s.store.Close()
+	err := s.store.SetFakeBlocks()
+	if err != nil {
+		return func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "Blocks don't created")
+		}
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "Blocks Created")
+	}
+}
+
+/*func (s *APIserver) handleRemoveBlocks() http.HandlerFunc {
+	s.store.Connect()
+	defer s.store.Close()
+	err := s.store.RemoveFakeBlocks()
+	if err != nil {
+		return func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "Blocks dont deleted")
+		}
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "Blocks deleted")
+	}
+} //*/
 
 func (s *APIserver) configureStore() {
 

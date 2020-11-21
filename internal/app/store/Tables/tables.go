@@ -7,11 +7,12 @@ import (
 
 //Block ...
 type Block struct {
-	RefPointer int      `sql:"-"`
-	TableName  struct{} `sql:"Blocks"`
-	BlockNum   int64    `sql:"block_num"`
-	BlockHash  string   `sql:"block_hash"`
-	TimeStamp  int64    `sql:"time_stamp"`
+	RefPointer       int      `sql:"-"`
+	TableName        struct{} `sql:"Blocks"`
+	BlockNum         int64    `sql:"block_num"`
+	BlockHash        string   `sql:"block_hash"`
+	TimeStamp        int64    `sql:"time_stamp"`
+	TransactionCount int64    `sql:"transaction_count"`
 }
 
 //Transaction ...
@@ -33,7 +34,7 @@ type Transaction struct {
 
 //CreateBlockTable ...
 func CreateBlockTable(DB *pg.DB) error {
-	err := DB.CreateTable(&Block{}, &orm.CreateTableOptions{})
+	err := DB.CreateTable(&Block{}, &orm.CreateTableOptions{IfNotExists: true})
 
 	if err != nil {
 		return err
@@ -44,11 +45,40 @@ func CreateBlockTable(DB *pg.DB) error {
 
 //CreateTransactionTable ...
 func CreateTransactionTable(DB *pg.DB) error {
-	err := DB.CreateTable(&Transaction{}, &orm.CreateTableOptions{})
+	err := DB.CreateTable(&Transaction{}, &orm.CreateTableOptions{IfNotExists: true})
 
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+//AddBlock ...
+func (b *Block) AddBlock(DB *pg.DB) error {
+	err := DB.Insert(b)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//RemoveBlock ..
+func (b *Block) RemoveBlock(DB *pg.DB) error {
+	_, err := DB.Model(b).Where("block_hash = ?block_hash").Delete()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//AddTransaction ...
+func (tr *Transaction) AddTransaction(DB *pg.DB) error {
+	err := DB.Insert(tr)
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
