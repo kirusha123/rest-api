@@ -72,7 +72,7 @@ func (s *APIserver) handleHello() http.HandlerFunc {
 }
 
 func (s *APIserver) handleCreateTeables() http.HandlerFunc {
-	s.store.Connect()
+	//s.store.Connect()
 	err := s.store.CreateTables()
 	if err != nil {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -87,8 +87,8 @@ func (s *APIserver) handleCreateTeables() http.HandlerFunc {
 }
 
 func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
-	s.store.Connect()
-	defer s.store.Close()
+	//s.store.Connect()
+	//defer s.store.Close()
 	err := s.store.SetFakeBlocks()
 	if err != nil {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +101,8 @@ func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
 }
 
 /*func (s *APIserver) handleRemoveBlocks() http.HandlerFunc {
-	s.store.Connect()
-	defer s.store.Close()
+	//s.store.Connect()
+	//defer s.store.Close()
 	err := s.store.RemoveFakeBlocks()
 	if err != nil {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -116,5 +116,5 @@ func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
 
 func (s *APIserver) configureStore() {
 
-	s.store.Connect()
+	//s.store.Connect()
 }

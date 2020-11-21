@@ -16,10 +16,12 @@ type Store struct {
 
 //New ...
 func New(config *Config) *Store {
-	return &Store{
+	st := &Store{
 		cfg: config,
 		db:  nil,
 	}
+	st.Connect()
+	return st
 }
 
 //GetDB ...
