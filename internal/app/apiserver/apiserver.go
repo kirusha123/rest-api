@@ -60,7 +60,7 @@ func (s *APIserver) configureLogger() error {
 
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
-	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables())
+	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables()).Methods("PUT")
 	//s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks())
 	//s.router.HandleFunc("/api/remove/blocks", s.handleRemoveBlocks())
 
