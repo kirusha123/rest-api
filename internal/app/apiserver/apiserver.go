@@ -61,8 +61,9 @@ func (s *APIserver) configureLogger() error {
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
 	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables())
-	s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks())
+	//s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks())
 	//s.router.HandleFunc("/api/remove/blocks", s.handleRemoveBlocks())
+
 }
 
 func (s *APIserver) handleHello() http.HandlerFunc {
@@ -86,6 +87,7 @@ func (s *APIserver) handleCreateTeables() http.HandlerFunc {
 
 }
 
+/*
 func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
 	//s.store.Connect()
 	//defer s.store.Close()
@@ -113,8 +115,3 @@ func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
 		io.WriteString(w, "Blocks deleted")
 	}
 } //*/
-
-func (s *APIserver) configureStore() {
-
-	//s.store.Connect()
-}
