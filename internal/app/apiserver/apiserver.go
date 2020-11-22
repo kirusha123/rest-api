@@ -1,11 +1,14 @@
 package apiserver
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/kirusha123/rest-api/internal/app/store"
+	tables "github.com/kirusha123/rest-api/internal/app/store/Tables"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,7 +40,7 @@ func (s *APIserver) Start() error {
 	s.configureRouter()
 	s.logger.Info("starting api server")
 
-	s.configureStore()
+	//s.configureStore()
 	if testDB := s.store.GetDB(); testDB == nil {
 		s.logger.Info("Failed to connect db")
 		return nil
@@ -60,10 +63,54 @@ func (s *APIserver) configureLogger() error {
 
 func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
-	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables()).Methods("PUT")
-	//s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks())
+	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables()).Methods("POST")
+	s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks()).Methods("POST")
+	s.router.HandleFunc("/api/get/blocks", s.handleGetBlocks()).Methods("GET")
+	s.router.HandleFunc("/api/get/block/{id}", s.handleGetBlock()).Methods("GET")
 	//s.router.HandleFunc("/api/remove/blocks", s.handleRemoveBlocks())
 
+}
+
+func (s *APIserver) handleGetBlock() http.HandlerFunc {
+	DB := s.store.GetDB()
+
+	var block tables.Block
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Content-type", "application/json")
+		params := mux.Vars(r)
+		n, _ := strconv.Atoi(params["id"])
+		block.BlockNum = int64(n)
+		err := DB.Model(&block).Where("block_num = ?block_num").Select()
+		if err != nil {
+			json.NewEncoder(w).Encode(block)
+		} else {
+			json.NewEncoder(w).Encode(tables.Block{})
+			str := "params[id] = " + params["id"] + "\nQueryfailed"
+			io.WriteString(w, str)
+		}
+
+	}
+}
+
+func (s *APIserver) handleGetBlocks() http.HandlerFunc {
+
+	DB := s.store.GetDB()
+	var blocks []tables.Block
+
+	err := DB.Model(&blocks).Select()
+	if err != nil {
+		return func(w http.ResponseWriter, r *http.Request) {
+			s.logger.Info(err)
+			io.WriteString(w, "Query failed")
+		}
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-type", "application/json")
+		json.NewEncoder(w).Encode(blocks)
+		io.WriteString(w, "Query Success")
+	}
 }
 
 func (s *APIserver) handleHello() http.HandlerFunc {
@@ -87,7 +134,6 @@ func (s *APIserver) handleCreateTeables() http.HandlerFunc {
 
 }
 
-/*
 func (s *APIserver) handleCreateBlocks() http.HandlerFunc {
 	//s.store.Connect()
 	//defer s.store.Close()

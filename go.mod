@@ -15,5 +15,6 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/tools v0.0.0-20201112185108-eeaa07dd7696 // indirect
+	honnef.co/go/tools v0.0.1-2020.1.6 // indirect
 	mellium.im/sasl v0.2.1 // indirect
 )

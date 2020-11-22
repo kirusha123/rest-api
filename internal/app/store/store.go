@@ -24,7 +24,7 @@ func New(config *Config) *Store {
 	return st
 }
 
-//GetDB ...
+//GetDB ...неправильно
 func (s *Store) GetDB() *pg.DB {
 	return s.db
 }
