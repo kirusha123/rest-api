@@ -65,10 +65,30 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()) //test server function
 	s.router.HandleFunc("/api/create/tables", s.handleCreateTeables()).Methods("POST")
 	s.router.HandleFunc("/api/create/blocks", s.handleCreateBlocks()).Methods("POST")
+	s.router.HandleFunc("/api/create/blocks/{count}", s.handleCreateBlocksN()).Methods("POST")
 	s.router.HandleFunc("/api/get/blocks", s.handleGetBlocks()).Methods("GET")
 	s.router.HandleFunc("/api/get/block/{id}", s.handleGetBlock()).Methods("GET")
 	//s.router.HandleFunc("/api/remove/blocks", s.handleRemoveBlocks())
 
+}
+
+func (s *APIserver) handleCreateBlocksN() http.HandlerFunc {
+
+	DB := s.store.GetDB()
+
+	var blocks []tables.Block
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-type", "application/json")
+		params := mux.Vars(r)
+		count, _ := strconv.Atoi(params["count"])
+		blocks = tables.CreateRandBlock(count, DB)
+		if len(blocks) != 0 {
+			json.NewEncoder(w).Encode(blocks)
+		} else {
+			json.NewEncoder(w).Encode(tables.Block{})
+		}
+	}
 }
 
 func (s *APIserver) handleGetBlock() http.HandlerFunc {

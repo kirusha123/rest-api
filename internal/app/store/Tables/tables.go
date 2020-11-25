@@ -1,6 +1,9 @@
 package tables
 
 import (
+	"math/rand"
+	"time"
+
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
@@ -71,6 +74,24 @@ func (b *Block) RemoveBlock(DB *pg.DB) error {
 		return err
 	}
 	return nil
+}
+
+func CreateRandBlock(count int, DB *pg.DB) []Block {
+	var blocks []Block
+
+	rand.Seed(time.Now().Unix())
+
+	for i := 1; i <= count; i++ {
+		block := Block{
+			BlockHash:        "hash",
+			BlockNum:         rand.Int63(),
+			TimeStamp:        rand.Int63(),
+			TransactionCount: rand.Int63(),
+		}
+		blocks = append(blocks, block)
+	}
+	DB.Model(blocks).Insert()
+	return blocks
 }
 
 //AddTransaction ...
