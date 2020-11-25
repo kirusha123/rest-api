@@ -7,8 +7,8 @@ import (
 
 //Block ...
 type Block struct {
-	RefPointer       int      `sql:"-"`
-	TableName        struct{} `sql:"Blocks"`
+	RefPointer       int      `sql:"-" json:"-"`
+	TableName        struct{} `sql:"Blocks" json:"-"`
 	BlockNum         int64    `sql:"block_num"`
 	BlockHash        string   `sql:"block_hash"`
 	TimeStamp        int64    `sql:"time_stamp"`
