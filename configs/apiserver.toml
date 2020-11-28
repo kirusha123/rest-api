@@ -1,7 +1,3 @@
 bind_addr = ":8080"
-log_lvl = "debug"
 
-db_user = "postgres"
-db_pass = "admin"
-db_addr = "localhost:5432"
-db_name = "TestDB"
+log_level = "error"
