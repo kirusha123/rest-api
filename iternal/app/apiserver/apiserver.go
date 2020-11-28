@@ -62,6 +62,7 @@ func (s *APIserver) configureRouter() {
 
 	s.router.HandleFunc("/hello", s.handlehello())
 	s.router.HandleFunc("/api/get/time", s.handletime()).Methods("GET")
+	s.router.HandleFunc("/api/get/txs", s.handleGetTxs()).Methods("GET")
 	s.router.HandleFunc("/api/get/blocks", s.handleGetBlocks()).Methods("GET")
 	s.router.HandleFunc("/api/get/blocks/{id}", s.handleGetBlock()).Methods("GET")
 	s.router.HandleFunc("/api/get/blocktxs/{bid}", s.handleGetBlockTxs()).Methods("GET")
@@ -69,6 +70,26 @@ func (s *APIserver) configureRouter() {
 	s.router.HandleFunc("/api/create/blocks/{count}", s.handleCreateBlocksN()).Methods("POST")
 	s.router.HandleFunc("/api/create/transactions/{Blockid}", s.handleCreateTransactions()).Methods("POST")
 	s.router.HandleFunc("/api/create/transaction/{bid}", s.handleCreateTx()).Methods("POST")
+}
+
+func (s *APIserver) handleGetTxs() http.HandlerFunc {
+	DB := s.store.GetDB()
+	if DB == nil {
+		return func(w http.ResponseWriter, r *http.Request) {
+			s.logger.Info("Failed connect to db")
+			io.WriteString(w, "Failed connect to db")
+		}
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var txs []*tables.Transaction
+		q_err := DB.Model(&txs).Select()
+		if q_err != nil {
+			s.logger.Info("\nFailed to get TXs\n", q_err)
+		} else {
+			json.NewEncoder(w).Encode(txs)
+		}
+	}
 }
 
 func (s *APIserver) handleCreateTx() http.HandlerFunc {
